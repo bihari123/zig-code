@@ -1,7 +1,7 @@
 const std = @import("std");
-
+const print = std.debug.print;
 pub fn main() !void {
-    var x: i8 = 10;
+    var x: i8 = 1;
     // simple switch
     switch (x) {
         -1...1 => {
