@@ -2,28 +2,47 @@ const std = @import("std");
 const fs = std.fs;
 const os = std.os;
 const print = std.debug.print;
-pub fn main() !void {
-    const filePath = "/media/tarun/6D7F-B6EF/GitHub/zig-code/projects/zig-wc/test.txt";
 
-    if (isFileExists(filePath)) {
-        print("File {s} Exists\n", .{filePath});
-    } else {
-        print("File {s} NOT Exists\n", .{filePath});
-    }
-}
+const fileInfo = union(enum) { exists: bool, bytes: usize, lines: usize, err: fs.File.OpenError };
 
-fn isFileExists(filePath: []const u8) bool {
+fn getFileInfo(filePath: []const u8) fileInfo {
     const file = fs.openFileAbsolute(filePath, .{}) catch |err| switch (err) {
         fs.File.OpenError.FileNotFound => {
-            print("File {s} Not Found\n", .{filePath});
-            return false;
+            return fileInfo{ .exists = false };
         },
         else => {
-            print("File {s} Not Accessed: \n", .{filePath});
-            return false;
+            return fileInfo{ .err = err };
         },
     };
+    defer file.close();
+    var gpa: std.heap.GeneralPurposeAllocator(.{}) = .{};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+    const fileContent = file.readToEndAlloc(allocator, comptime std.math.maxInt(usize)) catch {
+        return fileInfo{ .err = fs.File.OpenError.Unexpected };
+    };
+    defer allocator.free(fileContent);
+    return fileInfo{ .bytes = fileContent.len };
+}
+pub fn main() !void {
+    //// Get the path
+    // var path_buffer: [std.fs.MAX_PATH_BYTES]u8 = undefined;
+    // const path = try std.fs.realpath("./src/main.zig", &path_buffer);
+    const filePath = "/media/tarun/6D7F-B6EF/GitHub/zig-code/projects/zig-wc/test.txt";
 
-    _ = file;
-    return true;
+    const fileInfoValues = getFileInfo(filePath);
+    switch (fileInfoValues) {
+        .err => print("Error accessing the file: {s}.  \n", .{filePath}),
+        .exists => |*exists| if (!exists.*) {
+            print("File {s} Not Exists\n", .{filePath});
+        },
+        .bytes => |*bytes| print("The bytes are {}\n", .{bytes.*}),
+        .lines => {},
+    }
+
+    // if (isFileExists(filePath)) {
+    //     print("File {s} Exists\n", .{filePath});
+    // } else {
+    //     print("File {s} NOT Exists\n", .{filePath});
+    // }
 }
