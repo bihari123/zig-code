@@ -13,4 +13,9 @@ pub fn main() void {
 
     _ = c;
     _ = inferred; //Assignments can also be used to ignore expressions.
+
+    const inferred_const = @as(i32, 5);
+    _ = inferred_const; //@as performs an explicit type coercion
+    const inferred_variable = @as(u32, 5000);
+    _ = inferred_variable;
 }
