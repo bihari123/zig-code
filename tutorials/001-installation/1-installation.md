@@ -2,7 +2,7 @@
 
 ## Step 1
 
-download the zip file from the official download page
+download the zip file from the official download page (remember to download version 0.13.0. Master is unstable right now)
 [https://ziglang.org/download/]
 
 ## Step 2
@@ -11,18 +11,18 @@ Extract the zig file
 
 ## Step 3
 
-move the zip file to /usr/local
-
-```
-sudo mv zig-linux-x86_64-0.12.0-dev.1632+acf9de376 /usr/local/
-```
-
-## Step 4
-
 Rename the folder containing zig to **_zig_**
 
 ```
 mv ./zig-linux-x86_64-0.12.0-dev.1632+acf9de376 ./zig
+```
+
+## Step 4
+
+move the zig folder to /usr/local
+
+```
+sudo mv zig /usr/local/
 ```
 
 ## Step 5
